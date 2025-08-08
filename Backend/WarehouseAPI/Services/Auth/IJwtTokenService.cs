@@ -9,5 +9,5 @@ public interface IJwtTokenService
 {
     public string GenerateToken(User user);
 
-    public LoginResponseDto Login(UserLoginDto dto);
+    public LoginResponseDto Login(UserInfoDto dto);
 }

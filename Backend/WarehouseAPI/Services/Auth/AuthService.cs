@@ -20,7 +20,7 @@ namespace WarehouseAPI.Services
             _context = context;
         }
 
-        public LoginResponseDto Login(UserLoginDto request)
+        public LoginResponseDto Login(UserInfoDto request)
         {
             var response = new LoginResponseDto();
             var user = _context.Users.SingleOrDefault(u => u.Username == request.Username);
@@ -50,7 +50,7 @@ namespace WarehouseAPI.Services
         {
             var claims = new List<Claim>
             {
-                new Claim("role",user.Role)
+                new Claim("role", user.Role)
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:Key"]!));

@@ -23,7 +23,7 @@ namespace WarehouseAPI.Models
         [Required]
         [MaxLength(10)]
         [Column("role")]
-        public string Role { get; set; } = string.Empty;
+        public string Role { get; set; } = default!;
 
         [Column("created_at")]
         public DateTime CreatedAt { get; set; } = DateTime.Now;

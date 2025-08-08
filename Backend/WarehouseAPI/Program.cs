@@ -15,6 +15,7 @@ builder.Services.AddDbContext<WarehouseContext>(options =>
 // Register services
 builder.Services.AddScoped<IInwardService, InwardService>();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
+builder.Services.AddScoped<IPurchaseService, PurchaseService>(); // add
 
 // Configure JWT Authentication
 builder.Services.AddAuthentication(options =>
@@ -25,6 +26,9 @@ builder.Services.AddAuthentication(options =>
 })
     .AddJwtBearer(options =>
     {
+        // Keep JWT claim types unchanged (so "role" stays "role")
+        options.MapInboundClaims = false;
+
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
@@ -34,14 +38,16 @@ builder.Services.AddAuthentication(options =>
             ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
             ValidAudience = builder.Configuration["JwtSettings:Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:Key"]!))
+                Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:Key"]!)),
+            // Make [Authorize(Roles="...")] and policies use the "role" claim
+            RoleClaimType = "role"
         };
     });
 
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("AdminPolicy", policy => policy.RequireClaim("role", "1"));
-    options.AddPolicy("StaffPolicy", policy => policy.RequireClaim("role", "2"));
+    options.AddPolicy("AdminPolicy", policy => policy.RequireClaim("role", "admin"));
+    options.AddPolicy("StaffPolicy", policy => policy.RequireClaim("role", "staff", "admin"));
 });
 
 builder.Services.AddControllers();

@@ -21,7 +21,7 @@ namespace WarehouseAPI.Controllers
         /// Get all pending purchase orders that can be received
         /// </summary>
         [HttpGet("pending-purchases")]
-        [Authorize(Roles = "admin,staff")] // Both admin and staff can view
+        [Authorize(Policy = "StaffPolicy")] // Both admin and staff can view
         public async Task<ActionResult<List<PendingPurchaseDto>>> GetPendingPurchases()
         {
             try
@@ -39,7 +39,7 @@ namespace WarehouseAPI.Controllers
         /// Get a specific pending purchase order by ID
         /// </summary>
         [HttpGet("pending-purchases/{purchaseId:int}")]
-        [Authorize(Roles = "admin,staff")]
+        [Authorize(Policy = "StaffPolicy")] // Both admin and staff can view
         public async Task<ActionResult<PendingPurchaseDto>> GetPendingPurchase(int purchaseId)
         {
             try
@@ -61,7 +61,7 @@ namespace WarehouseAPI.Controllers
         /// Receive items from a purchase order (partial receiving)
         /// </summary>
         [HttpPost("receive")]
-        [Authorize(Roles = "admin,staff")]
+        [Authorize(Policy = "AdminPolicy")]
         public async Task<ActionResult<ReceivePurchaseResponseDto>> ReceivePurchase([FromBody] ReceivePurchaseRequestDto request)
         {
             try
