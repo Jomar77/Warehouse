@@ -1,9 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using WarehouseAPI.Data;
 using WarehouseAPI.Services;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,7 +17,12 @@ builder.Services.AddScoped<IInwardService, InwardService>();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 
 // Configure JWT Authentication
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+})
     .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
@@ -32,36 +38,40 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminPolicy", policy => policy.RequireClaim("role", "1"));
+    options.AddPolicy("StaffPolicy", policy => policy.RequireClaim("role", "2"));
+});
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
+
+builder.Services.AddSwaggerGen(options =>
 {
-    c.SwaggerDoc("v1", new() { Title = "Warehouse API", Version = "v1" });
-    
-    // Add JWT Authentication to Swagger
-    c.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+        Description = @"JWT Authorization header using the Bearer scheme.<br/>
+                      Example: '12345abcdef'",
         Name = "Authorization",
-        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
-        Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
-        Scheme = "Bearer"
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT"
     });
 
-    c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement()
     {
         {
-            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            new OpenApiSecurityScheme
             {
-                Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                Reference = new OpenApiReference
                 {
-                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                    Type = ReferenceType.SecurityScheme,
                     Id = "Bearer"
                 }
             },
-            Array.Empty<string>()
+            new List<string>()
         }
     });
 });
