@@ -20,7 +20,7 @@ namespace WarehouseAPI.Controllers
         /// <summary>
         /// Get all pending purchase orders that can be received
         /// </summary>
-        [HttpGet("pending-purchases")]
+        [HttpGet, Route("pending-purchases")]
         [Authorize(Policy = "StaffPolicy")] // Both admin and staff can view
         public async Task<ActionResult<List<PendingPurchaseDto>>> GetPendingPurchases()
         {
@@ -38,7 +38,7 @@ namespace WarehouseAPI.Controllers
         /// <summary>
         /// Get a specific pending purchase order by ID
         /// </summary>
-        [HttpGet("pending-purchases/{purchaseId:int}")]
+        [HttpGet, Route("pending-purchases/{purchaseId:int}")]
         [Authorize(Policy = "StaffPolicy")] // Both admin and staff can view
         public async Task<ActionResult<PendingPurchaseDto>> GetPendingPurchase(int purchaseId)
         {
@@ -60,8 +60,8 @@ namespace WarehouseAPI.Controllers
         /// <summary>
         /// Receive items from a purchase order (partial receiving)
         /// </summary>
-        [HttpPost("receive")]
-        [Authorize(Policy = "AdminPolicy")]
+        [HttpPost, Route("receive")]
+        [Authorize(Policy = "StaffPolicy")] // Both admin and staff can receive
         public async Task<ActionResult<ReceivePurchaseResponseDto>> ReceivePurchase([FromBody] ReceivePurchaseRequestDto request)
         {
             try
@@ -86,8 +86,8 @@ namespace WarehouseAPI.Controllers
         /// <summary>
         /// Approve and finalize purchase receipt (triggers inventory update)
         /// </summary>
-        [HttpPost("approve/{purchaseId:int}")]
-        [Authorize(Roles = "admin")] // Only admin can approve
+        [HttpPost, Route("approve/{purchaseId:int}")]
+        [Authorize(Policy = "AdminPolicy")] // Only admin can approve
         public async Task<ActionResult<ReceivePurchaseResponseDto>> ApprovePurchaseReceipt(int purchaseId)
         {
             try

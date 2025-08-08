@@ -138,13 +138,16 @@ namespace WarehouseAPI.Services
             if (purchase.Status != "Ordered")
                 throw new InvalidOperationException("Purchase is not in Ordered status");
 
-            // Update status to Received - this will trigger the database trigger
-            // which will update product quantities and set received_date
-            purchase.Status = "Received";
+            // Perform UPDATE without EF Core OUTPUT clause (avoids trigger conflict)
+            var affected = await _context.Database.ExecuteSqlInterpolatedAsync($@"
+                UPDATE [purchases]
+                SET [status] = 'Received'
+                WHERE [purchase_id] = {purchaseId} AND [status] = 'Ordered';");
 
-            await _context.SaveChangesAsync();
+            if (affected == 0)
+                throw new InvalidOperationException("Purchase status was not updated (already received or not found).");
 
-            // Refresh to get updated data from trigger
+            // Reload the entity so trigger-updated values (e.g., received_date) are visible
             await _context.Entry(purchase).ReloadAsync();
 
             var receivedItems = purchase.PurchaseItems.Select(pi => new ReceivedItemDto

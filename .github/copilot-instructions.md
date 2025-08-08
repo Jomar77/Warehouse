@@ -1,6 +1,7 @@
 use best practices for naming conventions, code organization, and documentation.
  e.g. default!, ? nullable reference types, etc.
-use the following keywords to guide your responses:
+find the following keywords to guide your responses. If not present, then
+ assume the default behavior:
 - "aqfc" = ask questions for clarification
  e.g. 
  I want to change the color of the button to blue. aqfc.
