@@ -16,6 +16,7 @@ builder.Services.AddDbContext<WarehouseContext>(options =>
 builder.Services.AddScoped<IInwardService, InwardService>();
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 builder.Services.AddScoped<IPurchaseService, PurchaseService>(); // add
+builder.Services.AddScoped<IOutwardService, OutwardService>();
 
 // Configure JWT Authentication
 builder.Services.AddAuthentication(options =>
