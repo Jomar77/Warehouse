@@ -5,6 +5,7 @@ export default function Login() {
 	const navigate = useNavigate();
 	const [form, setForm] = useState({ email: "", password: "" });
 	const [show, setShow] = useState(false);
+	const [error, setError] = useState("");
 
 	function onChange(e) {
 		const { name, value } = e.target;
@@ -13,8 +14,27 @@ export default function Login() {
 
 	function onSubmit(e) {
 		e.preventDefault();
-		// Mock login; no API. Redirect into app
-		navigate("/Orders", { replace: true });
+		// Check localStorage for registered user
+		setError("");
+		try {
+			const raw = localStorage.getItem("auth.registeredUser");
+			const saved = raw ? JSON.parse(raw) : null;
+			if (!saved) {
+				setError("No registered user found. Please register first.");
+				return;
+			}
+			if ((saved.email || "").trim().toLowerCase() !== form.email.trim().toLowerCase()) {
+				setError("Invalid credentials. Email does not match the registered user.");
+				return;
+			}
+			if ((saved.password || "") !== form.password) {
+				setError("Invalid credentials. Password is incorrect.");
+				return;
+			}
+			navigate("/Orders", { replace: true });
+		} catch {
+			setError("Stored registration data is invalid. Please register again.");
+		}
 	}
 
 	return (
@@ -76,6 +96,10 @@ export default function Login() {
 							</div>
 
 							<button className="w-full rounded bg-brand text-white py-2 text-sm font-medium">Sign in</button>
+
+							{error && (
+								<p className="mt-3 text-sm text-red-700 bg-red-50 border border-red-200 rounded px-3 py-2">{error}</p>
+							)}
 						</form>
 
 						<p className="mt-6 text-sm text-slate-600">
