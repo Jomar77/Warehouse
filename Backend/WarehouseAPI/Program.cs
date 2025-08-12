@@ -18,6 +18,30 @@ builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 builder.Services.AddScoped<IPurchaseService, PurchaseService>(); // add
 builder.Services.AddScoped<IOutwardService, OutwardService>();
 
+// Configure CORS Policy
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("WarehousePolicy", policy =>
+    {
+        policy.WithOrigins(
+                "http://localhost:3000",     // React default port
+                "http://localhost:5173",     // Vite default port
+                "http://localhost:4173"      // Vite preview port
+            )
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials();
+    });
+
+    // Development policy for testing (more permissive)
+    options.AddPolicy("DevelopmentPolicy", policy =>
+    {
+        policy.AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader();
+    });
+});
+
 // Configure JWT Authentication
 builder.Services.AddAuthentication(options =>
 {
@@ -92,6 +116,14 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
     app.UseSwagger();
     app.UseSwaggerUI();
+    
+    // Use more permissive CORS policy in development
+    app.UseCors("DevelopmentPolicy");
+}
+else
+{
+    // Use strict CORS policy in production
+    app.UseCors("WarehousePolicy");
 }
 
 app.UseHttpsRedirection();

@@ -1,41 +1,53 @@
 import React from "react";
-import { createRoot } from "react-dom/client";
+import ReactDOM from "react-dom/client";
 import {
+  RouterProvider,
   createBrowserRouter,
   createRoutesFromElements,
-  RouterProvider,
   Route,
   Navigate,
 } from "react-router-dom";
 import "./index.css";
 
 import Root from "./Routes/Root.jsx";
+import Login from "./Routes/Login.jsx";
 import Orders from "./Routes/Orders.jsx";
 import Products from "./Routes/Products.jsx";
 import Purchases from "./Routes/Purchases.jsx";
 import Register from "./Routes/Register.jsx";
 import NotFound from "./routes-shared/NotFound.jsx";
 import ErrorPage from "./routes-shared/ErrorPage.jsx";
-import Login from "./Routes/Login.jsx";
+import ProtectedRoute from "./Components/ProtectedRoute.jsx";
+import { AuthProvider } from "./Context/AuthContext.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <>
       <Route path="/login" element={<Login />} />
-      <Route path="/" element={<Root />} errorElement={<ErrorPage />}>
+      <Route path="/register" element={<Register />} />
+      <Route
+        path="/"
+        element={
+          <ProtectedRoute>
+            <Root />
+          </ProtectedRoute>
+        }
+        errorElement={<ErrorPage />}
+      >
         <Route index element={<Navigate to="/Orders" replace />} />
         <Route path="Orders" element={<Orders />} />
         <Route path="Products" element={<Products />} />
         <Route path="Purchases" element={<Purchases />} />
-        <Route path="Register" element={<Register />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </>
   )
 );
 
-createRoot(document.getElementById("root")).render(
+ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
   </React.StrictMode>
 );

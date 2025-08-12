@@ -1,6 +1,4 @@
 import { useMemo } from "react";
-import { useSessionStorage } from "../utils/useSessionStorage";
-import { useLocalStorage } from "../utils/useLocalStorage";
 import SearchBar from "../Components/searchbar";
 import { SegmentedBar, ToolbarButton } from "../Components/ui/SegmentedBar";
 import SortableTh from "../Components/ui/SortableTh";
