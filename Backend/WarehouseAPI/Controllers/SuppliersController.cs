@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WarehouseAPI.Data;
 using WarehouseAPI.Models;
+using WarehouseAPI.Dtos;
 
 namespace WarehouseAPI.Controllers
 {
@@ -23,16 +24,62 @@ namespace WarehouseAPI.Controllers
 
         // GET: api/Suppliers
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Supplier>>> GetSuppliers()
+        public async Task<ActionResult<IEnumerable<SupplierDto>>> GetSuppliers()
         {
-            return await _context.Suppliers.ToListAsync();
+            var suppliers = await _context.Suppliers
+                .Include(s => s.Products)
+                .Select(s => new SupplierDto
+                {
+                    SupplierId = s.SupplierId,
+                    Name = s.Name,
+                    ContactPerson = s.ContactPerson,
+                    Email = s.Email,
+                    Phone = s.Phone,
+                    Address = s.Address,
+                    Products = s.Products.Select(p => new ProductDto
+                    {
+                        ProductId = p.ProductId,
+                        Sku = p.Sku,
+                        Name = p.Name,
+                        Category = p.Category,
+                        QuantityOnHand = p.QuantityOnHand,
+                        ReorderLevel = p.ReorderLevel,
+                        SupplierId = p.SupplierId,
+                        Location = p.Location
+                    }).ToList()
+                })
+                .ToListAsync();
+            return suppliers;
         }
 
         // GET: api/Suppliers/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Supplier>> GetSupplier(int id)
+        public async Task<ActionResult<SupplierDto>> GetSupplier(int id)
         {
-            var supplier = await _context.Suppliers.FindAsync(id);
+            var supplier = await _context.Suppliers
+                .Include(s => s.Products)
+                .Where(s => s.SupplierId == id)
+                .Select(s => new SupplierDto
+                {
+                    SupplierId = s.SupplierId,
+                    Name = s.Name,
+                    ContactPerson = s.ContactPerson,
+                    Email = s.Email,
+                    Phone = s.Phone,
+                    Address = s.Address,
+                    Products = s.Products.Select(p => new ProductDto
+                    {
+                        ProductId = p.ProductId,
+                        Sku = p.Sku,
+                        Name = p.Name,
+                        Category = p.Category,
+                        QuantityOnHand = p.QuantityOnHand,
+                        ReorderLevel = p.ReorderLevel,
+                        SupplierId = p.SupplierId,
+                        Location = p.Location
+                    }).ToList()
+                })
+                .FirstOrDefaultAsync();
 
             if (supplier == null)
             {

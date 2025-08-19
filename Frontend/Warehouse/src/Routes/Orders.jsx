@@ -60,7 +60,7 @@ export default function Orders() {
         );
     };
 
-    const handleCreateOrder = async (data) => {
+    const handleCreateOrder = async ({ customerName, items, authenticatedFetch }) => {
         setCreating(true);
         try {
             const response = await authenticatedFetch(
@@ -71,12 +71,16 @@ export default function Orders() {
                         "Content-Type": "application/json",
                         "Accept": "application/json"
                     },
-                    body: JSON.stringify(data)
+                    body: JSON.stringify({ customerName, items })
                 }
             );
             if (!response.ok) {
-                const error = await response.json();
-                alert(error.message || "Failed to create order");
+                let errorMsg = "Failed to create order";
+                try {
+                    const error = await response.json();
+                    errorMsg = error.message || errorMsg;
+                } catch {}
+                alert(errorMsg);
                 return;
             }
             await fetchOrders();

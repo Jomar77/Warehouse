@@ -1,4 +1,4 @@
-namespace WarehouseAPI.Dtos.Products
+namespace WarehouseAPI.Dtos
 {
     public sealed class ProductDto
     {

@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { useDataContext } from "../../Context/DataContext";
+import { useAuth } from "../../Context/AuthContext";
 
 export default function CreateOrderModal({ open, onClose, onSubmit }) {
   const { products, loading: productsLoading } = useDataContext();
+  const { authenticatedFetch } = useAuth();
   const [customerName, setCustomerName] = useState("");
   const [items, setItems] = useState([{ productId: 1, quantity: 1 }]);
   const [submitting, setSubmitting] = useState(false);
@@ -21,9 +23,12 @@ export default function CreateOrderModal({ open, onClose, onSubmit }) {
   const handleSubmit = async e => {
     e.preventDefault();
     setSubmitting(true);
-    await onSubmit({ customerName, items });
-    setSubmitting(false);
-    onClose();
+    try {
+      await onSubmit({ customerName, items, authenticatedFetch });
+    } finally {
+      setSubmitting(false);
+      onClose();
+    }
   };
 
   return (

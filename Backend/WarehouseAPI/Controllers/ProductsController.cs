@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WarehouseAPI.Data;
 using WarehouseAPI.Models;
-using WarehouseAPI.Dtos.Products;
+using WarehouseAPI.Dtos;
 
 namespace WarehouseAPI.Controllers
 {

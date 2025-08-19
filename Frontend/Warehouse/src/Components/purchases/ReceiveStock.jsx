@@ -11,7 +11,7 @@ export default function ReceiveStock({ onCancel, options = [] }) {
             <select className="w-full rounded border border-slate-300 px-3 py-2 text-sm" defaultValue="">
               <option value="" disabled>Select a PO</option>
               {options.map((p) => (
-                <option key={p.id} value={p.id}>{p.id} — {p.supplier}</option>
+                <option key={p.purchaseId} value={p.purchaseId}>{p.poNumber} — {p.supplierName}</option>
               ))}
             </select>
           </div>
