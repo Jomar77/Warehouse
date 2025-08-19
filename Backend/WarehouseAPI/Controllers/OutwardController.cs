@@ -94,23 +94,6 @@ namespace WarehouseAPI.Controllers
             }
         }
 
-        [HttpPost, Route("")]
-        [Authorize(Policy = "StaffPolicy")]
-        public async Task<ActionResult<object>> Create([FromBody] CreateOrderRequestDto request)
-        {
-            try
-            {
-                var newId = await _outwardService.CreateOrderAsync(request);
-                return CreatedAtAction(nameof(GetPendingOrder), new { orderId = newId }, new { orderId = newId });
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "Error creating order", error = ex.Message });
-            }
-        }
+      
     }
 }

@@ -62,7 +62,8 @@ namespace WarehouseAPI.Controllers
             {
                 Token = token,
                 Role = user.Role,
-                Message = "Success"
+                Message = "Success",
+                Name = user.Username
             };
 
             return Ok(response);

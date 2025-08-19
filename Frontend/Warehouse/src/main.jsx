@@ -18,6 +18,7 @@ import Register from "./Routes/Register.jsx";
 import NotFound from "./routes-shared/NotFound.jsx";
 import ErrorPage from "./routes-shared/ErrorPage.jsx";
 import ProtectedRoute from "./Components/ProtectedRoute.jsx";
+import {DataProvider} from "./Context/DataContext.jsx";
 import { AuthProvider } from "./Context/AuthContext.jsx";
 
 const router = createBrowserRouter(
@@ -47,7 +48,9 @@ const router = createBrowserRouter(
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <AuthProvider>
-      <RouterProvider router={router} />
+      <DataProvider>
+        <RouterProvider router={router} />
+      </DataProvider>
     </AuthProvider>
   </React.StrictMode>
 );

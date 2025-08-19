@@ -1,7 +1,9 @@
 import { useNavigate, NavLink } from "react-router-dom";
+import { useAuth } from "../Context/AuthContext";
 
 export default function Sidebar() {
     const navigate = useNavigate();
+    const { user } = useAuth(); // Assumes user info is stored in AuthContext
 
     function onLogout() {
         sessionStorage.removeItem("token");
@@ -36,8 +38,9 @@ export default function Sidebar() {
             {/* User info and logout */}
             <div className="border-t border-slate-200 pt-4 space-y-3">
                 <div className="flex items-center gap-3">
-                    <span className="text-sm text-slate-500">Logged in</span>
-                    <div className="h-8 w-8 rounded-full bg-brand" />
+                    <span className="text-sm text-slate-500">
+                        {user?.name ? `Logged in as ${user.name}` : "Logged in"}
+                    </span>
                 </div>
                 <button 
                     onClick={onLogout}

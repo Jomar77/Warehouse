@@ -6,6 +6,7 @@ import { SegmentedBar, ToolbarButton } from "../Components/ui/SegmentedBar";
 import SortableTh from "../Components/ui/SortableTh";
 import ShipOrder from "../Components/orders/ShipOrder";
 import ApproveOrder from "../Components/orders/ApproveOrder";
+import CreateOrderModal from "../Components/orders/CreateOrderModal";
 
 // Import utility functions
 import {
@@ -19,93 +20,79 @@ import {
 
 /**
  * Orders component that displays and manages customer orders
- * Fetches data from /api/Outward/pending-orders endpoint
  */
 export default function Orders() {
     const { authenticatedFetch } = useAuth();
     const [query, setQuery] = useState("");
-    const [view, setView] = useState("list"); // list | ship | approve
+    const [view, setView] = useState("list");
     const [sort, setSort] = useState({ key: "orderDate", dir: "desc" });
     const [orders, setOrders] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState("");
+    const [loading, setLoading] = useState(true);
+    const [creating, setCreating] = useState(false);
+    const [showCreateModal, setShowCreateModal] = useState(false);
 
-    /**
-     * Fetches pending orders from the API
-     */
-    const fetchPendingOrders = async () => {
+    const fetchOrders = async () => {
         try {
-            setIsLoading(true);
-            setError("");
-            
-            const baseUrl = import.meta.env.VITE_API_URL;
-            const response = await authenticatedFetch(`${baseUrl}/api/Outward/pending-orders`);
-            
-            if (!response.ok) {
-                throw new Error(`Failed to fetch orders: ${response.status}`);
-            }
-            
+            setLoading(true);
+            const response = await authenticatedFetch(`${import.meta.env.VITE_API_URL}/api/Outward/pending-orders`);
             const data = await response.json();
             setOrders(data || []);
-        } catch (fetchError) {
-            console.error("Error fetching pending orders:", fetchError);
-            setError("Failed to load orders. Please try again.");
+        } catch (error) {
+            console.error("Failed to fetch orders:", error);
+            setOrders([]);
         } finally {
-            setIsLoading(false);
+            setLoading(false);
         }
     };
 
-    // Fetch orders on component mount
     useEffect(() => {
-        fetchPendingOrders();
+        fetchOrders();
     }, []);
 
-    /**
-     * Filters orders based on search query using utility function
-     */
-    const filteredOrders = useMemo(() => {
-        return filterOrders(orders, query);
-    }, [query, orders]);
+    const filteredOrders = useMemo(() => filterOrders(orders, query), [query, orders]);
+    const sortedOrders = useMemo(() => sortOrders(filteredOrders, sort.key, sort.dir), [filteredOrders, sort]);
 
-    /**
-     * Sorts filtered orders based on current sort configuration using utility function
-     */
-    const sortedOrders = useMemo(() => {
-        return sortOrders(filteredOrders, sort.key, sort.dir);
-    }, [filteredOrders, sort]);
-
-    /**
-     * Toggles sort direction or sets new sort key
-     */
     const handleSortToggle = (sortKey) => {
-        setSort((currentSort) => 
-            currentSort.key === sortKey 
-                ? { key: sortKey, dir: currentSort.dir === "asc" ? "desc" : "asc" }
+        setSort(prev => 
+            prev.key === sortKey 
+                ? { key: sortKey, dir: prev.dir === "asc" ? "desc" : "asc" }
                 : { key: sortKey, dir: "asc" }
         );
     };
 
-    if (isLoading) {
+    const handleCreateOrder = async (data) => {
+        setCreating(true);
+        try {
+            const response = await authenticatedFetch(
+                `${import.meta.env.VITE_API_URL}/api/Order`,
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "application/json"
+                    },
+                    body: JSON.stringify(data)
+                }
+            );
+            if (!response.ok) {
+                const error = await response.json();
+                alert(error.message || "Failed to create order");
+                return;
+            }
+            await fetchOrders();
+            alert("Order created successfully!");
+        } catch (error) {
+            alert("Error creating order");
+        } finally {
+            setCreating(false);
+        }
+    };
+
+    if (loading) {
         return (
             <section className="space-y-4">
                 <div className="flex items-center justify-center p-8">
                     <div className="text-slate-500">Loading orders...</div>
-                </div>
-            </section>
-        );
-    }
-
-    if (error) {
-        return (
-            <section className="space-y-4">
-                <div className="rounded-lg border border-red-200 bg-red-50 p-4">
-                    <div className="text-red-700">{error}</div>
-                    <button 
-                        onClick={fetchPendingOrders}
-                        className="mt-2 px-3 py-1 text-sm bg-red-100 text-red-700 rounded hover:bg-red-200"
-                    >
-                        Retry
-                    </button>
                 </div>
             </section>
         );
@@ -126,7 +113,22 @@ export default function Orders() {
                     <ToolbarButton label="Ship" active={view === "ship"} onClick={() => setView("ship")} />
                     <ToolbarButton label="Approve" active={view === "approve"} onClick={() => setView("approve")} />
                 </SegmentedBar>
+                {/* Create Order Button */}
+                <button
+                    type="button"
+                    className="px-4 py-2 rounded bg-brand text-white text-sm mt-2"
+                    onClick={() => setShowCreateModal(true)}
+                    disabled={creating}
+                >
+                    Create Order
+                </button>
             </div>
+
+            <CreateOrderModal
+                open={showCreateModal}
+                onClose={() => setShowCreateModal(false)}
+                onSubmit={handleCreateOrder}
+            />
 
             {/* Orders List View */}
             {view === "list" && (
@@ -209,7 +211,7 @@ export default function Orders() {
                 <ShipOrder 
                     onCancel={() => setView("list")} 
                     options={orders} 
-                    onRefresh={fetchPendingOrders}
+                    onRefresh={fetchOrders}
                 />
             )}
 
@@ -218,7 +220,7 @@ export default function Orders() {
                 <ApproveOrder 
                     onCancel={() => setView("list")} 
                     pending={getPendingOrders(orders)}
-                    onRefresh={fetchPendingOrders}
+                    onRefresh={fetchOrders}
                 />
             )}
         </section>
