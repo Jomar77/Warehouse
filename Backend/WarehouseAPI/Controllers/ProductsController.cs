@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using WarehouseAPI.Data;
 using WarehouseAPI.Models;
 using WarehouseAPI.Dtos;
+using WarehouseAPI.Dtos.Products;
 
 namespace WarehouseAPI.Controllers
 {
@@ -144,6 +145,26 @@ namespace WarehouseAPI.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
+        }
+
+        // GET: api/Products/reorder-alerts
+        [HttpGet("reorder-alerts")]
+        public async Task<ActionResult<IEnumerable<ReorderAlertDto>>> GetReorderAlerts()
+        {
+            var reorderAlerts = await _context.Database
+                .SqlQueryRaw<ReorderAlertDto>(@"
+                    SELECT 
+                        product_id as ProductId,
+                        sku as Sku,
+                        name as Name,
+                        quantity_on_hand as QuantityOnHand,
+                        reorder_level as ReorderLevel,
+                        (reorder_level - quantity_on_hand) as ShortageAmount
+                    FROM vw_ReorderAlerts
+                ")
+                .ToListAsync();
+
+            return Ok(reorderAlerts);
         }
 
         private bool ProductExists(int id)

@@ -33,6 +33,7 @@ export default function Sidebar() {
                 <NavLink to="/Orders" className={navCls}>Orders</NavLink>
                 <NavLink to="/Products" className={navCls}>Products</NavLink>
                 <NavLink to="/Purchases" className={navCls}>Purchases</NavLink>
+                <NavLink to="/Suppliers" className={navCls}>Suppliers</NavLink>
             </nav>
 
             {/* User info and logout */}

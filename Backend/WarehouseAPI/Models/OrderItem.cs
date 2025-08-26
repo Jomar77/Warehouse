@@ -16,8 +16,12 @@ namespace WarehouseAPI.Models
         [Column("product_id")]
         public int ProductId { get; set; }
 
-        [Column("quantity")]
-        public int Quantity { get; set; }
+
+        [Column("quantity_ordered")]
+        public int QuantityOrdered { get; set; }
+
+        [Column("quantity_sent")]
+        public int? QuantitySent { get; set; }
 
         // Navigation properties
         [ForeignKey("OrderId")]

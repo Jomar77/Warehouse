@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useMemo } from "react";
 import SearchBar from "../Components/searchbar";
 import { SegmentedBar, ToolbarButton } from "../Components/ui/SegmentedBar";
@@ -71,8 +70,11 @@ export default function Purchases() {
 		);
 	}
 
+
+	// Debug: log all status values to help diagnose filtering issue
+	console.log("Purchase statuses:", sorted.map(p => p.status));
 	// Approve view: only submitted purchases
-	const submittedPurchases = sorted.filter((p) => (p.status || "").toLowerCase() === "submitted");
+	const submittedPurchases = sorted.filter((p) => ["submitted", "pending", "ordered"].includes((p.status || "").toLowerCase()));
 
 	if (loading) {
 		return (

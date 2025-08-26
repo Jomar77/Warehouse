@@ -6,7 +6,7 @@ export default function CreateOrderModal({ open, onClose, onSubmit }) {
   const { products, loading: productsLoading } = useDataContext();
   const { authenticatedFetch } = useAuth();
   const [customerName, setCustomerName] = useState("");
-  const [items, setItems] = useState([{ productId: 1, quantity: 1 }]);
+  const [items, setItems] = useState([{ productId: 1, quantityOrdered: 1 }]);
   const [submitting, setSubmitting] = useState(false);
 
   const handleItemChange = (idx, field, value) => {
@@ -17,7 +17,7 @@ export default function CreateOrderModal({ open, onClose, onSubmit }) {
     );
   };
 
-  const handleAddItem = () => setItems([...items, { productId: products[0]?.productId ?? 0, quantity: 1 }]);
+  const handleAddItem = () => setItems([...items, { productId: products[0]?.productId ?? 0, quantityOrdered: 1 }]);
   const handleRemoveItem = idx => setItems(items.filter((_, i) => i !== idx));
 
   const handleSubmit = async e => {
@@ -70,8 +70,8 @@ export default function CreateOrderModal({ open, onClose, onSubmit }) {
                     type="number"
                     min={1}
                     required
-                    value={item.quantity}
-                    onChange={e => handleItemChange(idx, "quantity", e.target.value)}
+                    value={item.quantityOrdered}
+                    onChange={e => handleItemChange(idx, "quantityOrdered", e.target.value)}
                     className="input input-bordered w-20"
                     placeholder="Quantity"
                   />

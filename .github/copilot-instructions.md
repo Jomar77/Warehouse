@@ -24,3 +24,4 @@ use jwt for authentication and authorization.
 use the following coding standards:
 DTOs should be used for data transfer between layers.
 controllers should handle HTTP requests and responses.
+use promisechains for asynchronous operations.

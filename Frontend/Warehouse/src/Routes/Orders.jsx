@@ -18,38 +18,59 @@ import {
     getPendingOrders
 } from "../utils/orderUtils";
 
-/**
- * Orders component that displays and manages customer orders
- */
 export default function Orders() {
     const { authenticatedFetch } = useAuth();
     const [query, setQuery] = useState("");
     const [view, setView] = useState("list");
     const [sort, setSort] = useState({ key: "orderDate", dir: "desc" });
+    const [statusFilter, setStatusFilter] = useState("all");
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [creating, setCreating] = useState(false);
     const [showCreateModal, setShowCreateModal] = useState(false);
 
-    const fetchOrders = async () => {
-        try {
-            setLoading(true);
-            const response = await authenticatedFetch(`${import.meta.env.VITE_API_URL}/api/Outward/pending-orders`);
-            const data = await response.json();
-            setOrders(data || []);
-        } catch (error) {
-            console.error("Failed to fetch orders:", error);
-            setOrders([]);
-        } finally {
-            setLoading(false);
-        }
+    const fetchOrders = () => {
+        setLoading(true);
+        authenticatedFetch(`${import.meta.env.VITE_API_URL}/api/Outward/pending-orders`)
+            .then(response => response.json())
+            .then(data => {
+                setOrders(data || []);
+            })
+            .catch(error => {
+                console.error("Failed to fetch orders:", error);
+                setOrders([]);
+            })
+            .finally(() => {
+                setLoading(false);
+            });
     };
 
     useEffect(() => {
         fetchOrders();
     }, []);
 
-    const filteredOrders = useMemo(() => filterOrders(orders, query), [query, orders]);
+    // Get unique statuses from orders
+    const uniqueStatuses = useMemo(() => {
+        const statuses = orders
+            .map(order => order.status)
+            .filter(status => status && status.trim() !== "")
+            .filter((status, index, array) => array.indexOf(status) === index)
+            .sort();
+        return statuses;
+    }, [orders]);
+
+    const filteredOrders = useMemo(() => {
+        let filtered = filterOrders(orders, query);
+        
+        // Apply status filter
+        if (statusFilter !== "all") {
+            filtered = filtered.filter(order => 
+                order.status?.toLowerCase() === statusFilter.toLowerCase()
+            );
+        }
+        
+        return filtered;
+    }, [query, orders, statusFilter]);
     const sortedOrders = useMemo(() => sortOrders(filteredOrders, sort.key, sort.dir), [filteredOrders, sort]);
 
     const handleSortToggle = (sortKey) => {
@@ -60,36 +81,40 @@ export default function Orders() {
         );
     };
 
-    const handleCreateOrder = async ({ customerName, items, authenticatedFetch }) => {
+    const handleCreateOrder = ({ customerName, items, authenticatedFetch }) => {
         setCreating(true);
-        try {
-            const response = await authenticatedFetch(
-                `${import.meta.env.VITE_API_URL}/api/Order`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Accept": "application/json"
-                    },
-                    body: JSON.stringify({ customerName, items })
-                }
-            );
-            if (!response.ok) {
-                let errorMsg = "Failed to create order";
-                try {
-                    const error = await response.json();
-                    errorMsg = error.message || errorMsg;
-                } catch {}
-                alert(errorMsg);
-                return;
+        return authenticatedFetch(
+            `${import.meta.env.VITE_API_URL}/api/Order`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
+                body: JSON.stringify({ customerName, items })
             }
-            await fetchOrders();
-            alert("Order created successfully!");
-        } catch (error) {
-            alert("Error creating order");
-        } finally {
-            setCreating(false);
-        }
+        )
+            .then(response => {
+                if (!response.ok) {
+                    return response.json()
+                        .then(error => {
+                            throw new Error(error.message || "Failed to create order");
+                        })
+                        .catch(() => {
+                            throw new Error("Failed to create order");
+                        });
+                }
+                return fetchOrders();
+            })
+            .then(() => {
+                alert("Order created successfully!");
+            })
+            .catch(error => {
+                alert(error.message || "Error creating order");
+            })
+            .finally(() => {
+                setCreating(false);
+            });
     };
 
     if (loading) {
@@ -112,6 +137,22 @@ export default function Orders() {
                     placeholder="Search orders by ID, customer, or status" 
                     className="w-full max-w-xl" 
                 />
+                
+                {/* Status Filter */}
+                <div className="flex items-center gap-2">
+                    <label className="text-sm font-medium text-slate-700">Filter by Status:</label>
+                    <select
+                        value={statusFilter}
+                        onChange={(e) => setStatusFilter(e.target.value)}
+                        className="px-3 py-1 border border-slate-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                        <option value="all">All Statuses</option>
+                        {uniqueStatuses.map(status => (
+                            <option key={status} value={status}>{status}</option>
+                        ))}
+                    </select>
+                </div>
+                
                 <SegmentedBar>
                     <ToolbarButton label="List" active={view === "list"} onClick={() => setView("list")} />
                     <ToolbarButton label="Ship" active={view === "ship"} onClick={() => setView("ship")} />

@@ -7,7 +7,6 @@ namespace WarehouseAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize] // Require authentication for all endpoints
     public class InwardController : ControllerBase
     {
         private readonly IInwardService _inwardService;

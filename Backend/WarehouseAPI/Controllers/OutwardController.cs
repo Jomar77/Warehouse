@@ -7,7 +7,6 @@ namespace WarehouseAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
     public class OutwardController : ControllerBase
     {
         private readonly IOutwardService _outwardService;
@@ -48,13 +47,14 @@ namespace WarehouseAPI.Controllers
             }
         }
 
+        // Ship endpoint only marks order as ready for approval, does not deduct stock
         [HttpPost, Route("ship")]
         [Authorize(Policy = "StaffPolicy")]
         public async Task<ActionResult<ShipOrderResponseDto>> Ship([FromBody] ShipOrderRequestDto request)
         {
             try
             {
-                var result = await _outwardService.ShipOrderAsync(request);
+                var result = await _outwardService.MarkOrderReadyForApprovalAsync(request);
                 return Ok(result);
             }
             catch (ArgumentException ex)
@@ -67,17 +67,18 @@ namespace WarehouseAPI.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Error shipping order", error = ex.Message });
+                return StatusCode(500, new { message = "Error marking order ready for approval", error = ex.Message });
             }
         }
 
+        // Approve endpoint performs shipping logic and triggers stock deduction
         [HttpPost, Route("approve/{orderId:int}")]
         [Authorize(Policy = "AdminPolicy")]
         public async Task<ActionResult<ShipOrderResponseDto>> Approve(int orderId)
         {
             try
             {
-                var result = await _outwardService.ApproveShipmentAsync(orderId);
+                var result = await _outwardService.ShipOrderAsync(orderId);
                 return Ok(result);
             }
             catch (ArgumentException ex)

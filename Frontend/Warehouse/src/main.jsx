@@ -14,6 +14,7 @@ import Login from "./Routes/Login.jsx";
 import Orders from "./Routes/Orders.jsx";
 import Products from "./Routes/Products.jsx";
 import Purchases from "./Routes/Purchases.jsx";
+import Suppliers from "./Routes/Suppliers.jsx";
 import Register from "./Routes/Register.jsx";
 import NotFound from "./routes-shared/NotFound.jsx";
 import ErrorPage from "./routes-shared/ErrorPage.jsx";
@@ -39,6 +40,7 @@ const router = createBrowserRouter(
         <Route path="Orders" element={<Orders />} />
         <Route path="Products" element={<Products />} />
         <Route path="Purchases" element={<Purchases />} />
+        <Route path="Suppliers" element={<Suppliers />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </>

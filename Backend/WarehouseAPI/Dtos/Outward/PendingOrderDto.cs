@@ -16,7 +16,8 @@ namespace WarehouseAPI.Dtos.Outward
         public int ProductId { get; set; }
         public string ProductName { get; set; } = string.Empty;
         public string Sku { get; set; } = string.Empty;
-        public int Quantity { get; set; }
+        public int QuantityOrdered { get; set; }
+        public int? QuantitySent { get; set; }
         public int QuantityOnHand { get; set; }
     }
 }

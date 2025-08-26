@@ -19,12 +19,8 @@ export default function CreatePurchase({ open, onClose, onCreated, creating, set
         const res = await authenticatedFetch(`${import.meta.env.VITE_API_URL}/api/Suppliers`);
         const data = await res.json();
         setSuppliers(data || []);
-        // Flatten all products from all suppliers
-        const allProducts = (data || []).flatMap(s => s.products || []);
-        setProducts(allProducts);
       } catch (err) {
         setSuppliers([]);
-        setProducts([]);
       }
     };
     fetchSuppliers();
@@ -38,7 +34,11 @@ export default function CreatePurchase({ open, onClose, onCreated, creating, set
     );
   };
 
-  const handleAddItem = () => setItems([...items, { productId: products[0]?.productId ?? "", quantityOrdered: 1 }]);
+  // Get products for selected supplier
+  const selectedSupplier = suppliers.find(s => String(s.supplierId) === String(supplierId));
+  const supplierProducts = selectedSupplier?.products || [];
+
+  const handleAddItem = () => setItems([...items, { productId: supplierProducts[0]?.productId ?? "", quantityOrdered: 1 }]);
   const handleRemoveItem = idx => setItems(items.filter((_, i) => i !== idx));
 
   const handleSubmit = async e => {
@@ -106,9 +106,10 @@ export default function CreatePurchase({ open, onClose, onCreated, creating, set
                 value={item.productId}
                 onChange={e => handleItemChange(idx, "productId", e.target.value)}
                 className="select select-bordered w-40"
+                disabled={!selectedSupplier}
               >
                 <option value="" disabled>Select product</option>
-                {products.map(p => (
+                {supplierProducts.map(p => (
                   <option key={p.productId} value={p.productId}>{p.name} ({p.sku})</option>
                 ))}
               </select>

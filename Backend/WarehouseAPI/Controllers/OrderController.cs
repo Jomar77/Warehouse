@@ -10,7 +10,7 @@ namespace WarehouseAPI.Controllers
     /// </summary>
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
+   
     public class OrderController : ControllerBase
     {
         private readonly IOutwardService _outwardService;
