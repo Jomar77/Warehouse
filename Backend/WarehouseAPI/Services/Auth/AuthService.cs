@@ -42,6 +42,7 @@ namespace WarehouseAPI.Services
             response.Token = token;
             response.Message = "Success";
             response.Role = user.Role;
+            response.Name = user.Username;
 
             return response;
         }
@@ -50,7 +51,9 @@ namespace WarehouseAPI.Services
         {
             var claims = new List<Claim>
             {
-                new Claim("role", user.Role)
+                new Claim("role", user.Role),
+                new Claim("name", user.Username),
+                new Claim("sub", user.UserId.ToString())
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:Key"]!));

@@ -200,11 +200,13 @@ export default function ShipOrder({ onCancel, onRefresh }) {
             disabled={submitting}
           >
             <option value="">Choose an order...</option>
-            {pendingOrders.map(order => (
-              <option key={order.orderId ?? order.id} value={order.orderId ?? order.id}>
-                Order #{order.orderId ?? order.id} - {order.customerName ?? order.customer}
-              </option>
-            ))}
+            {pendingOrders
+              .filter(order => order.status !== "Shipped")
+              .map(order => (
+                <option key={order.orderId ?? order.id} value={order.orderId ?? order.id}>
+                  Order #{order.orderId ?? order.id} - {order.customerName ?? order.customer}
+                </option>
+              ))}
           </select>
         </div>
 

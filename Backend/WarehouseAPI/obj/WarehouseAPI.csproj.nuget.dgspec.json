@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\jomna\\Documents\\GitHub\\Warehouse\\Backend\\WarehouseAPI\\WarehouseAPI.csproj": {}
+    "C:\\Users\\jomna\\Documents\\GitHub\\Warehouse\\backend\\WarehouseAPI\\WarehouseAPI.csproj": {}
   },
   "projects": {
-    "C:\\Users\\jomna\\Documents\\GitHub\\Warehouse\\Backend\\WarehouseAPI\\WarehouseAPI.csproj": {
+    "C:\\Users\\jomna\\Documents\\GitHub\\Warehouse\\backend\\WarehouseAPI\\WarehouseAPI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\jomna\\Documents\\GitHub\\Warehouse\\Backend\\WarehouseAPI\\WarehouseAPI.csproj",
+        "projectUniqueName": "C:\\Users\\jomna\\Documents\\GitHub\\Warehouse\\backend\\WarehouseAPI\\WarehouseAPI.csproj",
         "projectName": "WarehouseAPI",
-        "projectPath": "C:\\Users\\jomna\\Documents\\GitHub\\Warehouse\\Backend\\WarehouseAPI\\WarehouseAPI.csproj",
+        "projectPath": "C:\\Users\\jomna\\Documents\\GitHub\\Warehouse\\backend\\WarehouseAPI\\WarehouseAPI.csproj",
         "packagesPath": "C:\\Users\\jomna\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\jomna\\Documents\\GitHub\\Warehouse\\Backend\\WarehouseAPI\\obj\\",
+        "outputPath": "C:\\Users\\jomna\\Documents\\GitHub\\Warehouse\\backend\\WarehouseAPI\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

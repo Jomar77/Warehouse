@@ -1,44 +1,37 @@
 import { useState, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "../Context/AuthContext";
 
 export default function Login() {
     const navigate = useNavigate();
+    const { login } = useAuth();
     const usernameInput = useRef(null);
     const passwordInput = useRef(null);
     const [show, setShow] = useState(false);
     const [error, setError] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const LoginHandler = (e) => {
+    const LoginHandler = async (e) => {
         e.preventDefault();
+        setIsSubmitting(true);
+        setError("");
+        
         const username = usernameInput.current.value;
         const password = passwordInput.current.value;
 
-        const loginData = {
-            username: username,
-            password: password,
-        };
-
-        const BASEURL = import.meta.env.VITE_API_URL;
-        fetch(`${BASEURL}/api/Auth/login`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(loginData),
-        })
-            .then((res) => res.json())
-            .then((body) => {
-                if (body !== null && body.token) {
-                    sessionStorage.setItem("token", body.token);
-                    sessionStorage.setItem("role", body.role);
-                    navigate("/Orders");
-                } else {
-                    setError(body?.message || "Invalid credentials");
-                }
-            })
-            .catch(() => {
-                setError("Network error. Please try again.");
-            });
+        try {
+            const result = await login(username, password);
+            
+            if (result.success) {
+                navigate("/Orders");
+            } else {
+                setError(result.message || "Invalid credentials");
+            }
+        } catch (error) {
+            setError("Network error. Please try again.");
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -95,7 +88,13 @@ export default function Login() {
                                 />
                             </div>
 
-                            <button type="submit" className="w-full rounded bg-brand text-white py-2 text-sm font-medium">Sign in</button>
+                            <button 
+                                type="submit" 
+                                disabled={isSubmitting}
+                                className="w-full rounded bg-brand text-white py-2 text-sm font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {isSubmitting ? "Signing in..." : "Sign in"}
+                            </button>
 
                             {error && (
                                 <p className="mt-3 text-sm text-red-700 bg-red-50 border border-red-200 rounded px-3 py-2">{error}</p>

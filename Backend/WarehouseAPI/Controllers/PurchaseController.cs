@@ -20,7 +20,7 @@ namespace WarehouseAPI.Controllers
         /// Create a purchase order for a supplier
         /// </summary>
         [HttpPost]
-        [Authorize(Policy = "StaffPolicy")]  // Keep only this authorization
+        [Authorize (Policy = "StaffPolicy")]
         public async Task<ActionResult<CreatePurchaseResponseDto>> Create([FromBody] CreatePurchaseRequestDto dto, CancellationToken ct)
         {
             try

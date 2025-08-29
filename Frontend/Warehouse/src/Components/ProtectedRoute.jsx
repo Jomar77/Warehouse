@@ -1,22 +1,19 @@
 import { Navigate } from "react-router-dom";
-
-function isTokenValid(token) {
-    if (!token) return false;
-    
-    try {
-        const [, payload] = token.split(".");
-        const decoded = JSON.parse(atob(payload.replace(/-/g, "+").replace(/_/g, "/")));
-        const now = Math.floor(Date.now() / 1000);
-        return decoded.exp ? decoded.exp > now : true;
-    } catch {
-        return false;
-    }
-}
+import { useAuth } from "../Context/AuthContext";
 
 export default function ProtectedRoute({ children }) {
-    const token = sessionStorage.getItem("token");
+    const { isAuthenticated, isLoading } = useAuth();
     
-    if (!isTokenValid(token)) {
+    // Show loading state while authentication is being determined
+    if (isLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="text-slate-600">Loading...</div>
+            </div>
+        );
+    }
+    
+    if (!isAuthenticated) {
         return <Navigate to="/login" replace />;
     }
     

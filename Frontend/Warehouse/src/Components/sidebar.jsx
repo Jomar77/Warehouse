@@ -3,11 +3,10 @@ import { useAuth } from "../Context/AuthContext";
 
 export default function Sidebar() {
     const navigate = useNavigate();
-    const { user } = useAuth(); // Assumes user info is stored in AuthContext
+    const { user, logout } = useAuth();
 
     function onLogout() {
-        sessionStorage.removeItem("token");
-        sessionStorage.removeItem("role");
+        logout();
         navigate("/login");
     }
 
@@ -21,7 +20,7 @@ export default function Sidebar() {
     }
 
     return (
-        <aside className="row-span-2 bg-white border-r border-slate-200 p-4 flex flex-col">
+        <aside className="fixed left-0 top-0 bg-white border-r border-slate-200 p-4 flex flex-col h-screen overflow-hidden w-64 z-10">
             {/* Brand */}
             <div className="flex items-center gap-3 mb-8">
                 <div className="size-8 rounded bg-brand" />
@@ -40,7 +39,7 @@ export default function Sidebar() {
             <div className="border-t border-slate-200 pt-4 space-y-3">
                 <div className="flex items-center gap-3">
                     <span className="text-sm text-slate-500">
-                        {user?.name ? `Logged in as ${user.name}` : "Logged in"}
+                        Logged in as {user?.name || "Unknown User"}
                     </span>
                 </div>
                 <button 

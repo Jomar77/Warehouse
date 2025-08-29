@@ -20,11 +20,6 @@ namespace WarehouseAPI.Controllers
             _outwardService = outwardService;
         }
 
-        /// <summary>
-        /// Creates a new order.
-        /// </summary>
-        /// <param name="request">Order creation request DTO.</param>
-        /// <returns>Created order ID.</returns>
         [HttpPost]
         [Authorize(Policy = "StaffPolicy")]
         public async Task<ActionResult<object>> Create([FromBody] CreateOrderRequestDto request)
